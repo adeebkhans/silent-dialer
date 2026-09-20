@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Top bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/app_name"
+            android:textColor="@color/on_surface"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/settingsButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/settings"
+            android:src="@drawable/ic_settings"
+            app:tint="@color/on_surface" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/setDefaultButton"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/set_as_default"
+        android:visibility="gone" />
+
+    <!-- Number display -->
+    <TextView
+        android:id="@+id/numberDisplay"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:maxLines="2"
+        android:ellipsize="start"
+        android:textColor="@color/on_surface"
+        android:textSize="34sp"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="18sp"
+        android:autoSizeMaxTextSize="40sp"
+        tools:text="+91 98765 43210" />
+
+    <!-- Dial pad -->
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:alignmentMode="alignMargins"
+        android:columnCount="3"
+        android:rowCount="4"
+        android:useDefaultMargins="true">
+
+        <Button android:id="@+id/key1" style="@style/DialKey" android:text="1" />
+        <Button android:id="@+id/key2" style="@style/DialKey" android:text="2" />
+        <Button android:id="@+id/key3" style="@style/DialKey" android:text="3" />
+        <Button android:id="@+id/key4" style="@style/DialKey" android:text="4" />
+        <Button android:id="@+id/key5" style="@style/DialKey" android:text="5" />
+        <Button android:id="@+id/key6" style="@style/DialKey" android:text="6" />
+        <Button android:id="@+id/key7" style="@style/DialKey" android:text="7" />
+        <Button android:id="@+id/key8" style="@style/DialKey" android:text="8" />
+        <Button android:id="@+id/key9" style="@style/DialKey" android:text="9" />
+        <Button android:id="@+id/keyStar" style="@style/DialKey" android:text="*" />
+        <Button android:id="@+id/key0" style="@style/DialKey" android:text="0" />
+        <Button android:id="@+id/keyHash" style="@style/DialKey" android:text="#" />
+    </GridLayout>
+
+    <!-- Bottom action row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/callButton"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:background="@drawable/bg_call_button"
+            android:contentDescription="@string/call"
+            android:src="@drawable/ic_call"
+            app:tint="@color/white" />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <ImageButton
+                android:id="@+id/backspaceButton"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="end|center_vertical"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/delete"
+                android:src="@drawable/ic_backspace"
+                app:tint="@color/on_surface_muted" />
+        </FrameLayout>
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="bg_dark">#FF0E1116</color>
+    <color name="surface">#FF1B2027</color>
+    <color name="surface_variant">#FF2A313B</color>
+    <color name="on_surface">#FFECEFF4</color>
+    <color name="on_surface_muted">#FF9AA5B1</color>
+
+    <color name="accent">#FF3B82F6</color>
+    <color name="call_green">#FF2FBF71</color>
+    <color name="call_red">#FFE5484D</color>
+
+    <color name="key_normal">#FF262C35</color>
+    <color name="control_selected">#FF3B82F6</color>
+
+    <color name="ic_launcher_background">#FF0E1116</color>
+</resources>

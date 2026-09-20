@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="DialKey" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">64dp</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:layout_gravity">fill</item>
+        <item name="android:textSize">26sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:background">@drawable/bg_dial_key</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="ControlButton">
+        <item name="android:layout_width">64dp</item>
+        <item name="android:layout_height">64dp</item>
+        <item name="android:background">@drawable/bg_control_button</item>
+        <item name="android:scaleType">center</item>
+    </style>
+
+    <style name="ControlColumn">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="ControlLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:textColor">@color/on_surface_muted</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+</resources>

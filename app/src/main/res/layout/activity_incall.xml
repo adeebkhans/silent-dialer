@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Caller info -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/callState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/on_surface_muted"
+            android:textSize="16sp"
+            tools:text="In call" />
+
+        <TextView
+            android:id="@+id/callerNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/on_surface"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            tools:text="+91 98765 43210" />
+
+        <TextView
+            android:id="@+id/callTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/on_surface"
+            android:textSize="18sp"
+            android:visibility="gone"
+            tools:text="00:42" />
+
+        <TextView
+            android:id="@+id/secondCallHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/on_surface_muted"
+            android:textSize="13sp"
+            android:visibility="gone"
+            tools:text="1 call on hold in background" />
+    </LinearLayout>
+
+    <!-- Ongoing-call controls (mute / speaker / hold) -->
+    <LinearLayout
+        android:id="@+id/ongoingControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <LinearLayout style="@style/ControlColumn">
+                <ImageButton
+                    android:id="@+id/muteButton"
+                    style="@style/ControlButton"
+                    android:contentDescription="@string/mute"
+                    android:src="@drawable/ic_mic_off"
+                    app:tint="@color/on_surface" />
+                <TextView style="@style/ControlLabel" android:text="@string/mute" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/ControlColumn">
+                <ImageButton
+                    android:id="@+id/speakerButton"
+                    style="@style/ControlButton"
+                    android:contentDescription="@string/speaker"
+                    android:src="@drawable/ic_speaker"
+                    app:tint="@color/on_surface" />
+                <TextView style="@style/ControlLabel" android:text="@string/speaker" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/ControlColumn">
+                <ImageButton
+                    android:id="@+id/holdButton"
+                    style="@style/ControlButton"
+                    android:contentDescription="@string/hold"
+                    android:src="@drawable/ic_pause"
+                    app:tint="@color/on_surface" />
+                <TextView style="@style/ControlLabel" android:text="@string/hold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/hangupButton"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/bg_reject_button"
+            android:contentDescription="@string/hang_up"
+            android:src="@drawable/ic_call_end"
+            app:tint="@color/white" />
+    </LinearLayout>
+
+    <!-- Incoming-call controls (answer / reject) -->
+    <LinearLayout
+        android:id="@+id/incomingControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/rejectButton"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/bg_reject_button"
+                android:contentDescription="@string/reject"
+                android:src="@drawable/ic_call_end"
+                app:tint="@color/white" />
+
+            <TextView style="@style/ControlLabel" android:text="@string/reject" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/answerButton"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/bg_call_button"
+                android:contentDescription="@string/answer"
+                android:src="@drawable/ic_call"
+                app:tint="@color/white" />
+
+            <TextView style="@style/ControlLabel" android:text="@string/answer" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
