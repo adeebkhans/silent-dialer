@@ -1,156 +1,73 @@
-# Silent Dialer
+# Dialer
 
-A working native Android dialer (Kotlin) that can be set as your device's **default phone app**. It behaves like a normal dialer for every number, with one special behavior:
+A native Android phone app, written in Kotlin, that can serve as your device's default dialer. It works like any ordinary dialer — with one deliberate capability:
 
-> For a **single configurable target number**, when **you dial it** (outgoing only), the app automatically **removes that call's entry from the system call log** after the call ends. Every other number logs normally. Incoming calls from the target number are **not** affected.
+> **Call-log suppression for a single configured number.** When you *place* an outgoing call to that number, its entry is automatically removed from the device's system call log once the call ends. Every other number is logged normally, and incoming calls are never affected.
 
-The target number is **write-only**: the Settings screen lets you set/overwrite or clear it, but never displays the number it has stored.
+The target number is stored **write-only**: it can be set, overwritten, or cleared, but it is never displayed back anywhere in the UI.
 
-Built to be compiled entirely in the cloud with **GitHub Actions** — no Android Studio and no local build tools required. You edit files in the GitHub web UI from your phone, the Action builds a debug-signed APK, and you download it from the Actions tab.
-
----
-
-## What's in here
-
-- Kotlin, `minSdk 26`, `compileSdk/targetSdk 35`, Gradle 8.9 + Android Gradle Plugin 8.6.1.
-- Registers as a dialer and requests the **default-dialer role** via `RoleManager` (Android 10+) with a `TelecomManager` fallback for older versions.
-- `InCallService` + a complete in-call UI: incoming/outgoing calls, live state + duration timer, and answer / reject / hang-up / mute / speaker / hold wired to the `Call` object, with minimal multi-call (hold) handling.
-- Dial-pad main screen and a write-only Settings screen (target number persisted in `SharedPreferences`).
-- Call-log deletion that **waits and retries** (Android writes the log row *after* disconnect) and matches numbers by their **last 10 digits** so `+91…`, `0…`, and bare formats all match.
-- A GitHub Actions workflow that builds and uploads an installable **debug-signed** APK.
+The project is designed to build entirely in CI — no Android Studio, no local SDK. Push to GitHub, and a workflow produces an installable debug-signed APK.
 
 ---
 
-## 1. Create the repo and add the files from a phone browser
+## Features
 
-You cannot upload the binary `gradle-wrapper.jar` in the GitHub web editor — so this project **doesn't need you to**. The build workflow regenerates the Gradle wrapper in the cloud. You only ever paste text files.
+- Full default-dialer implementation: registers as a dialer and acquires the default-dialer role via `RoleManager` (Android 10+), with a `TelecomManager` fallback on older releases.
+- `InCallService` with a complete in-call screen — incoming and outgoing calls, live call state and duration timer, and answer / reject / hang-up / mute / speaker / hold all bound to the `Call` object. Minimal multi-call (hold/swap) handling included.
+- Dial-pad home screen and a write-only settings screen; the target number persists in `SharedPreferences`.
+- Robust call-log suppression: matches numbers by their **last 10 digits** (so `+91…`, `0…`, and bare formats all resolve to the same number) and polls the call-log provider with retries, because Android writes the log row *after* the call disconnects.
+- Material 3 dark UI.
 
-1. Go to **github.com** → sign in → tap **+** (top right) → **New repository**.
-2. Name it (e.g. `silent-dialer`), choose **Private** or **Public**, tick **Add a README**, then **Create repository**.
-3. For every file in this project: open the repo → **Add file** → **Create new file** → type the **exact path** (including folders, using `/`, e.g. `app/src/main/AndroidManifest.xml`) into the filename box → paste the file's contents → **Commit changes**.
-   - Typing `app/src/main/java/com/silentdialer/MainActivity.kt` automatically creates the folders.
-4. Add **all** files listed in the "File list" section below. The `gradlew`, `gradlew.bat`, and `gradle/wrapper/gradle-wrapper.properties` files are plain text — paste them like any other file. There is **no** `gradle-wrapper.jar` to add.
+## Tech
 
-> Tip: the GitHub mobile web editor is easier in **Desktop site** mode (browser menu → "Desktop site").
-
----
-
-## 2. Trigger the build
-
-The workflow runs automatically on every push (i.e. every time you commit a file). You can also run it manually:
-
-1. Open the repo → **Actions** tab.
-2. If prompted, click **I understand my workflows, enable them**.
-3. Select **Build Debug APK** on the left → **Run workflow** → **Run workflow**.
-
-Watch the run: green check = success, red X = failure (see Troubleshooting).
+| | |
+|---|---|
+| Language | Kotlin |
+| Min / Target SDK | 26 / 35 |
+| Build | Gradle 8.9 · Android Gradle Plugin 8.6.1 · JDK 17 |
+| Output | Debug-signed APK (`app-debug.apk`) |
 
 ---
 
-## 3. Download the APK
+## Build
 
-1. **Actions** tab → click the most recent successful **Build Debug APK** run.
-2. Scroll to the **Artifacts** section at the bottom → tap **app-debug**.
-3. It downloads a `app-debug.zip`. Open it with your phone's Files app and extract `app-debug.apk`.
+Every push runs the **Build Debug APK** workflow (`.github/workflows/build.yml`). To run it manually: **Actions → Build Debug APK → Run workflow**.
 
----
+The workflow checks out the source, provisions JDK 17 and Gradle 8.9, regenerates the Gradle wrapper, and runs `./gradlew assembleDebug`. The resulting APK is signed with the AGP debug key — no signing configuration required — and uploaded as the **app-debug** artifact, available at the bottom of each completed run.
 
-## 4. Sideload and set as default dialer
+> **Why the wrapper is generated in CI.** The binary `gradle-wrapper.jar` cannot be created through the GitHub web editor, so the workflow regenerates it (`gradle wrapper --gradle-version 8.9`) before invoking `./gradlew`. This keeps the entire repository editable from a browser — no binary files to upload.
 
-1. **Enable unknown sources:** when you tap the APK, Android asks to allow installs from that app (your browser/Files app). Go to **Settings → Apps → Special access → Install unknown apps** → pick the app you're installing from → **Allow**. Then reopen the APK and **Install**.
-2. Open **Silent Dialer**. It will request the phone/call-log/contacts/notification permissions — **Allow** them all (call-log access is required for the deletion feature).
-3. Tap **Set as default dialer** (or Android's prompt) and confirm. On Android 10+ this is the system **Default apps → Phone app** chooser.
-4. Open **Settings** (gear icon, top-right) → type the number you want hidden → **Save**. (The field stays blank afterwards by design — the number is stored but never shown.)
-5. Place a call to that number from the dial pad. After you hang up, its entry is removed from the phone's call log within a few seconds.
+To build locally instead:
 
----
-
-## File list
-
-```
-.github/workflows/build.yml
-.gitignore
-build.gradle
-settings.gradle
-gradle.properties
-gradlew
-gradlew.bat
-gradle/wrapper/gradle-wrapper.properties
-README.md
-app/build.gradle
-app/proguard-rules.pro
-app/src/main/AndroidManifest.xml
-app/src/main/java/com/silentdialer/MainActivity.kt
-app/src/main/java/com/silentdialer/SettingsActivity.kt
-app/src/main/java/com/silentdialer/InCallActivity.kt
-app/src/main/java/com/silentdialer/SilentInCallService.kt
-app/src/main/java/com/silentdialer/CallManager.kt
-app/src/main/java/com/silentdialer/CallLogCleaner.kt
-app/src/main/java/com/silentdialer/CallNotifier.kt
-app/src/main/java/com/silentdialer/Prefs.kt
-app/src/main/res/layout/activity_main.xml
-app/src/main/res/layout/activity_settings.xml
-app/src/main/res/layout/activity_incall.xml
-app/src/main/res/values/strings.xml
-app/src/main/res/values/colors.xml
-app/src/main/res/values/styles.xml
-app/src/main/res/values/themes.xml
-app/src/main/res/drawable/ic_call.xml
-app/src/main/res/drawable/ic_call_end.xml
-app/src/main/res/drawable/ic_backspace.xml
-app/src/main/res/drawable/ic_settings.xml
-app/src/main/res/drawable/ic_mic_off.xml
-app/src/main/res/drawable/ic_speaker.xml
-app/src/main/res/drawable/ic_pause.xml
-app/src/main/res/drawable/ic_launcher_foreground.xml
-app/src/main/res/drawable/bg_call_button.xml
-app/src/main/res/drawable/bg_reject_button.xml
-app/src/main/res/drawable/bg_dial_key.xml
-app/src/main/res/drawable/bg_control_button.xml
-app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
-app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
+```bash
+./gradlew assembleDebug
+# → app/build/outputs/apk/debug/app-debug.apk
 ```
 
----
+## Install
 
-## Troubleshooting first builds (from the web UI only)
+1. Download the **app-debug** artifact from the latest successful run and extract `app-debug.apk`.
+2. Install it (allow installs from your browser/file manager when prompted).
+3. Launch **Dialer** and grant the phone, call-log, contacts, and notification permissions — call-log access is required for suppression.
+4. Set it as the default dialer when prompted, or via **Settings → Apps → Default apps → Phone app**.
+5. In-app **Settings** (gear icon): enter the number to suppress and save. The field clears on save by design; the stored number is never shown again.
 
-You have no local tooling, so here's how to fix the failures that actually happen, using only the GitHub web editor.
-
-**How to read a failure:** Actions tab → click the red run → click the **build** job → expand the step with the red X. The last ~20 lines of that log say what broke.
-
-1. **"Could not find gradle-wrapper.jar" / wrapper errors.**
-   This project's workflow runs `gradle wrapper --gradle-version 8.9` *before* `./gradlew`, so the jar is generated in the cloud — you never commit it. If you see this, make sure you copied `.github/workflows/build.yml` exactly, and that `gradle/wrapper/gradle-wrapper.properties` says `gradle-8.9-bin.zip`.
-
-2. **Gradle / Android Gradle Plugin version mismatch** (e.g. "Minimum supported Gradle version is X" or "Android Gradle plugin requires Java …").
-   The pinned combo here is **Gradle 8.9 + AGP 8.6.1 + JDK 17** — a known-good match. If you change one, change the others to a compatible set. To fix from the web UI, edit **three** places to matching versions:
-   - `build.gradle` → `id 'com.android.application' version 'AGP_VERSION'`
-   - `.github/workflows/build.yml` → the two `8.9` values (`gradle-version:` and `--gradle-version`)
-   - `gradle/wrapper/gradle-wrapper.properties` → `gradle-<version>-bin.zip`
-
-3. **"Failed to install the following SDK components" / license errors.**
-   The GitHub `ubuntu-latest` runner already has the Android SDK and accepts licenses. This project uses `compileSdk 35`, which is available. If a future SDK isn't installed on the runner, lower `compileSdk`/`targetSdk` in `app/build.gradle` to 34.
-
-4. **"SDK location not found" / `local.properties`.**
-   Never commit `local.properties` (it's git-ignored here). The runner sets the SDK path itself. If you accidentally created it, delete it via the web UI.
-
-5. **Build is green but the app won't install ("App not installed").**
-   You likely have another debug build of the same app installed, or a corrupt download. Uninstall any previous copy, re-download the artifact, and re-extract the `.apk` from the zip.
-
-6. **The call log entry isn't deleted.**
-   - The app must be the **default dialer** and you must have granted **call-log** permissions.
-   - Deletion only applies to **outgoing** calls **you dial** to the saved number — not incoming calls.
-   - The saved number must match by its **last 10 digits**. Re-save it in Settings if unsure.
+Placing a call to that number now removes its call-log entry within a few seconds of hanging up.
 
 ---
 
-## How the "hide" logic works (quick tour)
+## Architecture
 
-- `Prefs.kt` stores the target number and normalizes any number to its **last 10 digits** for comparison.
-- `SilentInCallService` (the `InCallService`) forwards each `Call` to `CallManager`, which records whether the call was **outgoing** (via `Call.Details.callDirection` on API 29+, else the initial call state).
-- When a call ends, if it was outgoing **and** its last-10-digits match the saved target, `CallLogCleaner.deleteWithRetry(...)` runs. It polls the `CallLog.Calls` provider every ~1.2s (up to 8 tries) because Android writes the log row *after* disconnect, then deletes every matching row.
-- The Settings screen never reads the stored value back — it only overwrites or clears it.
+- **`SilentInCallService`** — the bound `InCallService`; the single source of truth for live calls. Forwards call lifecycle to `CallManager` and drives the in-call UI.
+- **`CallManager`** — process-wide holder for active `Call` objects and audio routing (mute/speaker). Records call direction via `Call.Details.callDirection` (API 29+), falling back to the initial call state, so only outgoing calls qualify for suppression.
+- **`CallLogCleaner`** — deletes matching rows from `CallLog.Calls`, retrying on a short interval to absorb the write-after-disconnect delay.
+- **`Prefs`** — write-only persistence for the target number, plus last-10-digit normalization.
+- **`MainActivity` / `InCallActivity` / `SettingsActivity`** — dial pad, in-call UI, and configuration.
 
-> This is a legitimate feature of an app **you install and control** on **your own device**, acting on **your own** call log. It cannot hide anything on the other party's phone or on the carrier's records.
-#   s i l e n t - d i a l e r  
- 
+## Version compatibility
+
+Gradle, AGP, and the JDK are pinned to a matched set (Gradle 8.9 / AGP 8.6.1 / JDK 17). If you change one, keep the others compatible — the versions live in `build.gradle` (AGP), `.github/workflows/build.yml` (Gradle), and `gradle/wrapper/gradle-wrapper.properties` (Gradle distribution). `compileSdk`/`targetSdk` are set in `app/build.gradle`.
+
+## Scope & limitations
+
+Suppression applies only to **outgoing calls you place** to the configured number, and acts only on the **local device call log** you own. It does not affect incoming calls, the other party's device, or carrier records — no installed app can.
