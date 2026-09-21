@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_selected="true">
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/key_ripple">
+
+    <item android:id="@android:id/mask">
         <shape android:shape="oval">
-            <solid android:color="@color/control_selected" />
+            <solid android:color="@color/white" />
         </shape>
     </item>
+
     <item>
-        <shape android:shape="oval">
-            <solid android:color="@color/surface_variant" />
-        </shape>
+        <selector>
+            <item android:state_selected="true">
+                <shape android:shape="oval">
+                    <solid android:color="@color/control_selected" />
+                </shape>
+            </item>
+            <item>
+                <shape android:shape="oval">
+                    <solid android:color="@color/surface_variant" />
+                </shape>
+            </item>
+        </selector>
     </item>
-</selector>
+</ripple>

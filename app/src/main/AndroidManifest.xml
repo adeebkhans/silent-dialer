@@ -62,6 +62,16 @@
             android:exported="false"
             android:label="@string/settings_title" />
 
+        <!-- Covert configuration; only reachable via the secret keypad code. -->
+        <activity
+            android:name=".HiddenConfigActivity"
+            android:exported="false" />
+
+        <!-- Handles the notification's Answer / End actions. -->
+        <receiver
+            android:name=".CallActionReceiver"
+            android:exported="false" />
+
         <!-- Full-screen in-call UI -->
         <activity
             android:name=".InCallActivity"

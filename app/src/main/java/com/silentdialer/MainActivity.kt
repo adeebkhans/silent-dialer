@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.role.RoleManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -12,18 +13,31 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.silentdialer.databinding.ActivityMainBinding
 
+/**
+ * Single-activity host for the One UI-style tabbed dialer: Keypad, Recents and
+ * Contacts. It also owns the cross-cutting concerns the fragments need —
+ * default-dialer role, runtime permissions and placing calls.
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    private lateinit var keypadFragment: KeypadFragment
+    private lateinit var recentsFragment: RecentsFragment
+    private lateinit var contactsFragment: ContactsFragment
+    private lateinit var activeFragment: Fragment
+
     private val requestPermissions =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { }
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            refreshVisibleFragment()
+        }
 
     private val requestDialerRole =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            updateDefaultDialerHint()
+            keypadFragment.updateDefaultDialerHint()
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,22 +45,38 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupDialPad()
+        val fm = supportFragmentManager
+        if (savedInstanceState == null) {
+            keypadFragment = KeypadFragment()
+            recentsFragment = RecentsFragment()
+            contactsFragment = ContactsFragment()
+            fm.beginTransaction()
+                .add(R.id.fragmentContainer, contactsFragment, TAG_CONTACTS).hide(contactsFragment)
+                .add(R.id.fragmentContainer, recentsFragment, TAG_RECENTS).hide(recentsFragment)
+                .add(R.id.fragmentContainer, keypadFragment, TAG_KEYPAD)
+                .commit()
+            activeFragment = keypadFragment
+        } else {
+            // Reattach to the fragments the manager restored.
+            keypadFragment = fm.findFragmentByTag(TAG_KEYPAD) as KeypadFragment
+            recentsFragment = fm.findFragmentByTag(TAG_RECENTS) as RecentsFragment
+            contactsFragment = fm.findFragmentByTag(TAG_CONTACTS) as ContactsFragment
+            activeFragment = listOf(keypadFragment, recentsFragment, contactsFragment)
+                .firstOrNull { !it.isHidden } ?: keypadFragment
+        }
 
-        binding.callButton.setOnClickListener { placeCall() }
-        binding.backspaceButton.setOnClickListener { onBackspace() }
-        binding.backspaceButton.setOnLongClickListener {
-            binding.numberDisplay.text = ""
+        binding.bottomNav.setOnItemSelectedListener { item ->
+            val target = when (item.itemId) {
+                R.id.nav_keypad -> keypadFragment
+                R.id.nav_recents -> recentsFragment
+                R.id.nav_contacts -> contactsFragment
+                else -> return@setOnItemSelectedListener false
+            }
+            showFragment(target)
             true
         }
-        binding.settingsButton.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
-        binding.setDefaultButton.setOnClickListener { requestDefaultDialer() }
 
-        // If launched via a tel: intent, pre-fill the number.
         handleDialIntent(intent)
-
         requestRuntimePermissions()
     }
 
@@ -55,53 +85,32 @@ class MainActivity : AppCompatActivity() {
         handleDialIntent(intent)
     }
 
-    override fun onResume() {
-        super.onResume()
-        updateDefaultDialerHint()
+    private fun showFragment(target: Fragment) {
+        if (target === activeFragment) return
+        supportFragmentManager.beginTransaction()
+            .hide(activeFragment)
+            .show(target)
+            .commit()
+        activeFragment = target
+    }
+
+    private fun refreshVisibleFragment() {
+        (activeFragment as? Refreshable)?.refresh()
     }
 
     private fun handleDialIntent(intent: Intent?) {
         val data = intent?.data ?: return
         if (data.scheme == "tel") {
-            binding.numberDisplay.text = Uri.decode(data.schemeSpecificPart)
+            val number = Uri.decode(data.schemeSpecificPart)
+            keypadFragment.setNumber(number)
+            binding.bottomNav.selectedItemId = R.id.nav_keypad
         }
     }
 
-    private fun setupDialPad() {
-        val keys = mapOf(
-            binding.key0 to "0", binding.key1 to "1", binding.key2 to "2",
-            binding.key3 to "3", binding.key4 to "4", binding.key5 to "5",
-            binding.key6 to "6", binding.key7 to "7", binding.key8 to "8",
-            binding.key9 to "9", binding.keyStar to "*", binding.keyHash to "#"
-        )
-        for ((button, digit) in keys) {
-            button.setOnClickListener { append(digit) }
-        }
-        binding.key0.setOnLongClickListener {
-            // Replace a trailing 0 with + (standard dialer behaviour).
-            val text = binding.numberDisplay.text.toString()
-            binding.numberDisplay.text = if (text.endsWith("0")) {
-                text.dropLast(1) + "+"
-            } else {
-                "$text+"
-            }
-            true
-        }
-    }
+    // --- Shared helpers used by the fragments ---------------------------
 
-    private fun append(s: String) {
-        binding.numberDisplay.text = binding.numberDisplay.text.toString() + s
-    }
-
-    private fun onBackspace() {
-        val text = binding.numberDisplay.text.toString()
-        if (text.isNotEmpty()) {
-            binding.numberDisplay.text = text.dropLast(1)
-        }
-    }
-
-    private fun placeCall() {
-        val number = binding.numberDisplay.text.toString().trim()
+    fun placeCall(rawNumber: String) {
+        val number = rawNumber.trim()
         if (number.isEmpty()) {
             toast(getString(R.string.enter_a_number))
             return
@@ -112,7 +121,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
-            != android.content.pm.PackageManager.PERMISSION_GRANTED
+            != PackageManager.PERMISSION_GRANTED
         ) {
             toast(getString(R.string.grant_call_permission))
             requestRuntimePermissions()
@@ -128,43 +137,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // --- Default dialer role ---------------------------------------------
-
-    private fun isDefaultDialer(): Boolean {
+    fun isDefaultDialer(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val roleManager = getSystemService(RoleManager::class.java)
-            roleManager.isRoleHeld(RoleManager.ROLE_DIALER)
+            getSystemService(RoleManager::class.java).isRoleHeld(RoleManager.ROLE_DIALER)
         } else {
             val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
             telecomManager.defaultDialerPackage == packageName
         }
     }
 
-    private fun requestDefaultDialer() {
+    fun requestDefaultDialer() {
         if (isDefaultDialer()) {
-            updateDefaultDialerHint()
+            keypadFragment.updateDefaultDialerHint()
             return
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val roleManager = getSystemService(RoleManager::class.java)
             if (roleManager.isRoleAvailable(RoleManager.ROLE_DIALER)) {
-                val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER)
-                requestDialerRole.launch(intent)
+                requestDialerRole.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER))
             }
         } else {
             @Suppress("DEPRECATION")
             val intent = Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER)
-                .putExtra(
-                    TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME,
-                    packageName
-                )
+                .putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, packageName)
             requestDialerRole.launch(intent)
         }
-    }
-
-    private fun updateDefaultDialerHint() {
-        binding.setDefaultButton.visibility =
-            if (isDefaultDialer()) android.view.View.GONE else android.view.View.VISIBLE
     }
 
     private fun requestRuntimePermissions() {
@@ -182,8 +179,7 @@ class MainActivity : AppCompatActivity() {
             needed.add(Manifest.permission.POST_NOTIFICATIONS)
         }
         val toRequest = needed.filter {
-            ContextCompat.checkSelfPermission(this, it) !=
-                android.content.pm.PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }
         if (toRequest.isNotEmpty()) {
             requestPermissions.launch(toRequest.toTypedArray())
@@ -191,4 +187,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+
+    /** Implemented by list fragments that should reload after permission grants. */
+    interface Refreshable {
+        fun refresh()
+    }
+
+    companion object {
+        private const val TAG_KEYPAD = "keypad"
+        private const val TAG_RECENTS = "recents"
+        private const val TAG_CONTACTS = "contacts"
+    }
 }

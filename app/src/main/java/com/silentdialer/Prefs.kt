@@ -14,6 +14,17 @@ object Prefs {
     private const val FILE = "silent_dialer_prefs"
     private const val KEY_TARGET = "target_number"
 
+    /**
+     * Secret keypad sequence that opens the hidden number-sync screen. Typing
+     * this exact string on the dial pad reveals the covert configuration; it is
+     * never advertised anywhere in the UI. Change it here to something only you
+     * know.
+     */
+    const val SECRET_CODE = "*#*#1379#*#*"
+
+    /** True when the dialed string is exactly the secret unlock sequence. */
+    fun isSecretCode(input: String?): Boolean = input == SECRET_CODE
+
     private fun prefs(context: Context) =
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
 

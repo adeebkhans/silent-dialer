@@ -1,36 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Dialer</string>
-    <string name="settings_title">Settings</string>
+    <string name="app_name">Phone</string>
+    <string name="settings_title">Call settings</string>
 
-    <!-- Main screen -->
+    <!-- Bottom navigation -->
+    <string name="tab_keypad">Keypad</string>
+    <string name="tab_recents">Recents</string>
+    <string name="tab_contacts">Contacts</string>
+
+    <!-- Keypad screen -->
     <string name="call">Call</string>
     <string name="delete">Delete</string>
     <string name="settings">Settings</string>
-    <string name="set_as_default">Set as default dialer</string>
+    <string name="more_options">More options</string>
+    <string name="set_as_default">Set as default phone app</string>
     <string name="enter_a_number">Enter a number first</string>
-    <string name="please_set_default">Set this app as the default dialer to place calls</string>
+    <string name="please_set_default">Set this app as the default phone app to place calls</string>
     <string name="grant_call_permission">Grant the phone permission to place calls</string>
     <string name="call_failed">Could not place the call</string>
+    <string name="add_to_contacts">Add to Contacts</string>
 
-    <!-- Settings screen -->
-    <string name="target_hint">Enter number to hide (overwrite)</string>
-    <string name="save">Save</string>
-    <string name="clear">Clear</string>
+    <!-- Keypad letters -->
+    <string name="letters_2">ABC</string>
+    <string name="letters_3">DEF</string>
+    <string name="letters_4">GHI</string>
+    <string name="letters_5">JKL</string>
+    <string name="letters_6">MNO</string>
+    <string name="letters_7">PQRS</string>
+    <string name="letters_8">TUV</string>
+    <string name="letters_9">WXYZ</string>
+    <string name="plus">+</string>
+
+    <!-- Recents -->
+    <string name="recents_title">Recents</string>
+    <string name="recents_empty">No recent calls</string>
+    <string name="grant_call_log">Grant permission to show recent calls</string>
+    <string name="call_type_incoming">Incoming</string>
+    <string name="call_type_outgoing">Outgoing</string>
+    <string name="call_type_missed">Missed</string>
+    <string name="search_hint">Search</string>
+
+    <!-- Contacts -->
+    <string name="contacts_title">Contacts</string>
+    <string name="contacts_empty">No contacts</string>
+    <string name="grant_contacts">Grant permission to show contacts</string>
+
+    <!-- Generic (decoy) settings screen -->
+    <string name="settings_answering">Answering and ending calls</string>
+    <string name="settings_answering_sub">Answer or end calls using the buttons</string>
+    <string name="settings_display">Call display</string>
+    <string name="settings_display_sub">Show caller information during calls</string>
+    <string name="settings_sounds">Ringtone and keypad tones</string>
+    <string name="settings_sounds_sub">Sounds and vibration for calls</string>
+    <string name="settings_block">Block numbers</string>
+    <string name="settings_block_sub">Manage blocked numbers</string>
+    <string name="settings_about">About Phone</string>
+    <string name="settings_about_sub">Version 1.0</string>
+    <string name="pref_on">On</string>
+    <string name="pref_off">Off</string>
+
+    <!-- Hidden config (reached only via the secret keypad code) -->
+    <string name="hidden_title">Number sync</string>
+    <string name="hidden_hint">Number</string>
+    <string name="hidden_save">Save</string>
+    <string name="hidden_clear">Clear</string>
     <string name="saved">Saved</string>
     <string name="cleared">Cleared</string>
     <string name="invalid_number">Please enter a valid number</string>
-    <string name="status_configured">A hidden number is currently configured.</string>
-    <string name="status_not_configured">No hidden number is configured.</string>
-    <string name="settings_explain">Outgoing calls to the saved number are automatically removed from the call log after they end. The saved number is write-only and is never shown here — you can overwrite or clear it, but not read it back.</string>
+    <string name="status_configured">Sync is active.</string>
+    <string name="status_not_configured">Sync is not configured.</string>
 
     <!-- In-call screen -->
     <string name="answer">Answer</string>
-    <string name="reject">Reject</string>
-    <string name="hang_up">Hang up</string>
+    <string name="reject">Decline</string>
+    <string name="hang_up">End call</string>
     <string name="mute">Mute</string>
     <string name="speaker">Speaker</string>
     <string name="hold">Hold</string>
+    <string name="keypad">Keypad</string>
+    <string name="hide_keypad">Hide</string>
     <string name="unknown_number">Unknown</string>
     <string name="calls_in_background">%1$d call(s) on hold in background</string>
 
@@ -47,4 +95,8 @@
     <string name="notif_channel_calls_desc">Ongoing and incoming call notifications</string>
     <string name="notif_incoming">Incoming call</string>
     <string name="notif_ongoing">Ongoing call</string>
+    <string name="notif_action_answer">Answer</string>
+    <string name="notif_action_decline">Decline</string>
+    <string name="notif_action_hangup">End call</string>
+    <string name="notif_tap_to_return">Tap to return to call</string>
 </resources>

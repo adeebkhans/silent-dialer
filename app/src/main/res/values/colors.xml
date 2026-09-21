@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Absolutes -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="bg_dark">#FF0E1116</color>
-    <color name="surface">#FF1B2027</color>
-    <color name="surface_variant">#FF2A313B</color>
-    <color name="on_surface">#FFECEFF4</color>
-    <color name="on_surface_muted">#FF9AA5B1</color>
+    <!-- One UI light palette (default) -->
+    <color name="window_bg">#FFFFFFFF</color>
+    <color name="surface">#FFFFFFFF</color>
+    <color name="surface_variant">#FFF1F2F4</color>
+    <color name="on_surface">#FF141414</color>
+    <color name="on_surface_muted">#FF8A9099</color>
+    <color name="divider">#FFECEEF1</color>
 
-    <color name="accent">#FF3B82F6</color>
-    <color name="call_green">#FF2FBF71</color>
-    <color name="call_red">#FFE5484D</color>
+    <color name="accent">#FF1B6EF3</color>
+    <color name="call_green">#FF25B45E</color>
+    <color name="call_red">#FFEB4B4B</color>
+    <color name="missed_red">#FFE5484D</color>
 
-    <color name="key_normal">#FF262C35</color>
-    <color name="control_selected">#FF3B82F6</color>
+    <color name="avatar_bg">#FFDCE3EA</color>
+    <color name="avatar_on">#FF5B6570</color>
 
+    <color name="nav_unselected">#FF8A9099</color>
+    <color name="control_selected">#FF1B6EF3</color>
+    <color name="key_ripple">#1F000000</color>
+
+    <!-- Legacy names kept so any older reference still resolves -->
+    <color name="bg_dark">#FFFFFFFF</color>
+    <color name="key_normal">#FFF1F2F4</color>
     <color name="ic_launcher_background">#FF0E1116</color>
 </resources>
