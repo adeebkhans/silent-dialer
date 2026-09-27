@@ -21,12 +21,6 @@ object CallManager {
     private val calls = mutableListOf<Call>()
     private var listener: Listener? = null
 
-    /**
-     * Fired on every call/state change so the bound service can refresh the
-     * ongoing-call notification even while the in-call UI is not in front.
-     */
-    var notificationHook: (() -> Unit)? = null
-
     /** Set by the service while it is bound. */
     var inCallService: InCallService? = null
 
@@ -36,12 +30,10 @@ object CallManager {
     private val callback = object : Call.Callback() {
         override fun onStateChanged(call: Call, state: Int) {
             listener?.onCallsChanged()
-            notificationHook?.invoke()
         }
 
         override fun onDetailsChanged(call: Call, details: Call.Details) {
             listener?.onCallsChanged()
-            notificationHook?.invoke()
         }
     }
 
@@ -61,9 +53,6 @@ object CallManager {
     fun heldCall(): Call? =
         calls.firstOrNull { it.stateCompat() == Call.STATE_HOLDING }
 
-    /** Dialed/caller number of the primary call, or null when unavailable. */
-    fun primaryNumber(): String? = primaryCall()?.let { numberOf(it) }
-
     fun onCallAdded(call: Call) {
         calls.add(call)
         call.registerCallback(callback)
@@ -71,23 +60,6 @@ object CallManager {
             outgoingCalls.add(call)
         }
         listener?.onCallsChanged()
-        notificationHook?.invoke()
-    }
-
-    /** Answer the ringing call (used by the notification action). */
-    fun answerPrimary() {
-        val call = calls.firstOrNull { it.stateCompat() == Call.STATE_RINGING } ?: primaryCall()
-        call?.answer(android.telecom.VideoProfile.STATE_AUDIO_ONLY)
-    }
-
-    /** Reject a ringing call or disconnect an ongoing one (notification action). */
-    fun hangupPrimary() {
-        val call = primaryCall() ?: return
-        if (call.stateCompat() == Call.STATE_RINGING) {
-            call.reject(false, null)
-        } else {
-            call.disconnect()
-        }
     }
 
     fun onCallRemoved(context: Context, call: Call) {
@@ -99,7 +71,6 @@ object CallManager {
             maybeDeleteFromCallLog(context, call)
         }
         listener?.onCallsChanged()
-        notificationHook?.invoke()
     }
 
     fun onAudioStateChanged() {
