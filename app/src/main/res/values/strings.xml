@@ -95,8 +95,4 @@
     <string name="notif_channel_calls_desc">Ongoing and incoming call notifications</string>
     <string name="notif_incoming">Incoming call</string>
     <string name="notif_ongoing">Ongoing call</string>
-    <string name="notif_action_answer">Answer</string>
-    <string name="notif_action_decline">Decline</string>
-    <string name="notif_action_hangup">End call</string>
-    <string name="notif_tap_to_return">Tap to return to call</string>
 </resources>
